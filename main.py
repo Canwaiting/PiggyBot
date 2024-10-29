@@ -14,6 +14,8 @@ def process_row(row):
     piggy = Piggy(number,tg_wabapp_data,proxy)
     piggy.finish_achievement_bll(settings.LEFT_SIDE_TASK_LIST)
     piggy.airdrop_code_take_bll(settings.AIRDROP_CODE_LIST)
+    piggy.finish_angle_box_bll()
+    piggy.get_daily_chest_bll()
     piggy.take_all_task_bll()
 
 if __name__ == "__main__":

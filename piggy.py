@@ -1,4 +1,3 @@
-# 全部扒起来，然后人工+手动
 import random
 import time
 from time_helper import *
@@ -62,6 +61,50 @@ class Piggy:
     def get_achievement_config(self):
         url = "https://api.prod.piggypiggy.io/game/GetAchievementConfig"
         response = requests.post(url, headers=self.get_headers(), json=None, proxies=self.get_proxies())
+        return response
+
+    def get_daily_chest_bll(self):
+        res = self.get_daily_chest()
+        res_json = res.json()
+        logger.info(f"账号：{self.number} | 获取每日宝箱 | {res_json}")
+
+    def finish_angle_box_bll(self):
+        res = self.get_angle_box_info()
+        res_json = res.json()
+        logger.info(f"账号：{self.number} | 获取天使宝箱信息 | {res_json}")
+
+        if res_json.get("msg") == "success":
+            logger.info(f"账号：{self.number} | 开始领取天使宝箱")
+            angle_box_task_list = res_json.get("data").get("box").get("tasks")
+            for angle_box_task in angle_box_task_list:
+                task_id = angle_box_task.get("taskID")
+                self.take_task_bll(task_id)
+                self.complete_task(task_id)
+            time.sleep(random.randint(1,5))
+            #TODO 领取奖励接口，测试账号有个任务卡住了。
+
+
+    def get_angle_box_info(self):
+        url = "https://api.prod.piggypiggy.io/game/angel_box_info"
+        data = {
+            "PlayerID": 0
+        }
+        response = requests.post(url, headers=self.get_headers(), json=data, proxies=self.get_proxies())
+        return response
+
+    def get_daily_chest(self):
+        url = "https://api.prod.piggypiggy.io/game/CreateStarPay"
+        data = {
+            "RoleType": 0,
+            "PlayerID": 0,
+            "UseStar": 0,
+            "ConfigID": "2001",
+            "Param": "",
+            "ClientParam": "2001",
+            "Count": 1,
+            "Ios": 0
+        }
+        response = requests.post(url, headers=self.get_headers(), json=data, proxies=self.get_proxies())
         return response
 
     def finish_achievement_bll(self, achievement_id_list):
